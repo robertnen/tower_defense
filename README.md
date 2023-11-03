@@ -2,7 +2,7 @@
 A 2D game made in Python using Pyglet
 
 # Objectives:
-- [x] Find a good game engine
+* [x] Find a good game engine
 - [x] Find songs for the game
 - [x] Find good sfx sounds
 - [ ] Find / Make textures or images
