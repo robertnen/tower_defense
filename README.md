@@ -5,7 +5,7 @@ A 2D game made in Python using Pyglet
 - [x] Find a good game engine
 - [x] Find songs for the game
 - [x] Find good sfx sounds
-- [ ] Find / Make textures or images
+- [x] Find / Make textures or images
 - [ ] Make the main Menu
     - [x] Make an "exit" button
     - [ ] Make a "settings" button
