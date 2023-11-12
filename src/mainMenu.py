@@ -1,150 +1,120 @@
 import pyglet
+import button
+import constant
 from pyglet.window import key
 from pyglet.window import mouse
-from pyglet import image
-import constant
 
-def isInRect(x, y, tx, ty, isAnim, button : pyglet.shapes.Rectangle): # animates the buttons
+def isInRect(x, y, tx, ty, button : button.Button): # animates the buttons
     if x >= tx and x <= tx + constant.MM_BUTTON_WIDTH and \
         y >= ty and y <= ty + constant.MM_BUTTON_HEIGHT:
-            if isAnim is False:
-                for i in range(100, 206):
-                    button.color = (i, i, i)
-                    isAnim = True
+            button.setSpriteColor(constant.LIGHT_GREY)
+            return True
+    else:
+            button.setSpriteColor(constant.GREY)
+            return False
 
-            else:
-                for i in range(205, 99, -1):
-                    button.color = (i, i, i)
-                isAnim = False
-    return isAnim
-
-class MainMenu(pyglet.window.Window):
+class MainMenu():
     win = None
-    img = None
-    batch = None # used for graphics
+
+    logo_img = None     # logo
+    logo_sprite = None
+
+    batch = None        # used for graphics
+
     width = None        # of window
     height = None       # of window
-    play_label = None
-    exit_label = None
+
     play_button = None
     exit_button = None
-    settings_label = None
     settings_button = None
-    isAnimPlay = False      # used for pseudo-hover
-    isAnimExit = False      # used for pseudo-hover
-    isAnimSettings = False  # used for pseudo-hover
+
+    isHidden = False    # used for mouse / keys events
 
     def __init__(self):
-        super(MainMenu, self).__init__()
+        self.win = pyglet.window.Window(fullscreen = True, caption = constant.GAME_TITLE)
 
-        self.win = pyglet.window.Window(fullscreen = True)
-
-        # temporary label
-        label = pyglet.text.Label('144 Hz if VSync off! Press ESC to close it',
-                          font_name = 'Times New Roman',
-                          font_size = 36,
-                          x = self.win.width / 2, y = self.win.height / 2 + 100,
-                          anchor_x = 'center', anchor_y = 'center')
+        # for graphics shapes
+        self.batch = pyglet.graphics.Batch()
 
         self.width = self.win.width;
         self.height = self.win.height;
 
         # define main menu logo
-        self.img = pyglet.resource.image('img/tower_defense.png')
-        self.img.width = 600
-        self.img.height = 200
+        self.logo_img = pyglet.resource.image(constant.LOGO_PATH)
 
-        # for shapes
-        self.batch = pyglet.graphics.Batch()
+        self.logo_img.width = constant.LOGO_WIDTH
+        self.logo_img.height = constant.LOGO_HEIGHT
 
-        self.play_label = pyglet.text.Label('Play',
-                                       font_name = 'Times New Roman',
-                                       font_size = 28,
-                                       x = self.win.width / 2,
-                                       y = self.win.height / 2,
-                                       anchor_x = 'center', anchor_y = 'center')
+        self.logo_sprite = pyglet.sprite.Sprite(self.logo_img, x = self.width / 2 - 300, y = self.height / 2 + 80,
+                                                batch = self.batch)
 
-        self.play_button = pyglet.shapes.Rectangle(x = self.width / 2 - 150, y = self.height / 2 - 30,
-                                            width = constant.MM_BUTTON_WIDTH, height = constant.MM_BUTTON_HEIGHT,
-                                            color = (100, 100, 100), batch = self.batch)
+        self.play_button = button.Button(constant.PLAY, constant.GREY,
+                                         self.width / 2 - 150, self.height / 2, self.batch)
 
-        self.settings_label = pyglet.text.Label('Settings',
-                                       font_name = 'Times New Roman',
-                                       font_size = 28,
-                                       x = self.win.width / 2,
-                                       y = self.win.height / 2  - 100,
-                                       anchor_x = 'center', anchor_y = 'center')
+        self.settings_button = button.Button(constant.SETTINGS, constant.GREY,
+                                         self.width / 2 - 150, self.height / 2 - 100, self.batch)
 
-        self.settings_button = pyglet.shapes.Rectangle(x = self.width / 2 - 150, y = self.height / 2 - 130,
-                                            width = constant.MM_BUTTON_WIDTH, height = constant.MM_BUTTON_HEIGHT,
-                                            color = (100, 100, 100), batch = self.batch)
-
-        self.exit_label = pyglet.text.Label('Exit',
-                                       font_name = 'Times New Roman',
-                                       font_size = 28,
-                                       x = self.win.width / 2,
-                                       y = self.win.height / 2 - 200,
-                                       anchor_x = 'center', anchor_y = 'center')
-
-        self.exit_button = pyglet.shapes.Rectangle(x = self.width / 2 - 150, y = self.height / 2 - 230,
-                                            width = constant.MM_BUTTON_WIDTH, height = constant.MM_BUTTON_HEIGHT,
-                                            color = (100, 100, 100), batch = self.batch)
-
-        # play_button.opacity = 100
+        self.exit_button = button.Button(constant.EXIT, constant.GREY,
+                                         self.width / 2 - 150, self.height / 2 - 200, self.batch)
 
         @self.win.event
         def on_draw():
             self.win.clear()
-            self.img.blit(self.width / 2 - 300, self.height / 2 + 80) # just an image test
-            label.draw()
             self.batch.draw()
-            self.play_button.draw()
-            self.play_label.draw()
-            self.settings_button.draw()
-            self.settings_label.draw()
-            self.exit_button.draw()
-            self.exit_label.draw()
 
         @self.win.event
         def on_key_press(symbol, modifiers):
-            match symbol:
-                case key.W:
-                    print('W', end = ' ')
-                case key.A:
-                    print('A', end = ' ')
-                case key.S:
-                    print('S', end = ' ')
-                case key.D:
-                    print('D', end = ' ')
-                case _:
-                    print('A key was pressed')
+            if constant.DEBUG or constant.DEBUG_KEYS:
+                match symbol:
+                    case key.W:
+                        print('W', end = ' ')
+                    case key.A:
+                        print('A', end = ' ')
+                    case key.S:
+                        print('S', end = ' ')
+                    case key.D:
+                        print('D', end = ' ')
+                    case _:
+                        print('A key was pressed')
 
         @self.win.event
         def on_mouse_press(x, y, button, modifiers):
-            match button:
-                case mouse.LEFT:
-                    print('LM', end = ' ')
-                case mouse.RIGHT:
-                    print('RM', end = ' ')
-                case _:
-                    print('Another mouse button was pressed')
+            if constant.DEBUG or constant.DEBUG_MOUSE:
+                match button:
+                    case mouse.LEFT:
+                        print('LM', end = ' ')
+                    case mouse.RIGHT:
+                        print('RM', end = ' ')
+                    case _:
+                        print('Another mouse button was pressed')
+                print(f'({x}, {y})')
 
-            tx = self.exit_button.x
-            ty = self.exit_button.y
+            # if still in main menu
+            if self.isHidden == False:
+                if isInRect(x, y, self.play_button.x, self.play_button.y, self.play_button):
+                    if constant.DEBUG:
+                        print('Play button pressed')
 
-            if x >= tx and x <= tx + constant.MM_BUTTON_WIDTH and \
-                y >= ty and y <= ty + constant.MM_BUTTON_HEIGHT:
+                if isInRect(x, y, self.settings_button.x, self.settings_button.y, self.settings_button):
+                    if constant.DEBUG:
+                        print('Settings button pressed')
+
+                if isInRect(x, y, self.exit_button.x, self.exit_button.y, self.exit_button):
+                    if constant.DEBUG:
+                        print('Exit button pressed')
+
                     self.exit_func() # the user wants to leave the game
-
-            print(f'({x}, {y})')
 
         @self.win.event
         def on_mouse_motion(x, y, dx, dy):
-            # print(f'({x}, {y})') # use this for debugging
+            if constant.DEBUG or constant.DEBUG_MOUSE:
+                print(f'({x}, {y})') # use this for debugging
 
-            self.isAnimPlay = isInRect(x, y, self.play_button.x, self.play_button.y, self.isAnimPlay, self.play_button)
-            self.isAnimExit = isInRect(x, y, self.exit_button.x, self.exit_button.y, self.isAnimExit, self.exit_button)
-            self.isAnimSettings = isInRect(x, y, self.settings_button.x, self.settings_button.y, self.isAnimSettings, self.settings_button)
+            # if still in main menu
+            if self.isHidden == False:
+                isInRect(x, y, self.play_button.x, self.play_button.y, self.play_button)
+                isInRect(x, y, self.settings_button.x, self.settings_button.y, self.settings_button)
+                isInRect(x, y, self.exit_button.x, self.exit_button.y, self.exit_button)
 
         @self.win.event
         def on_close():
@@ -157,3 +127,21 @@ class MainMenu(pyglet.window.Window):
 
     def exit_func(self):
         self.win.on_close()
+
+    def hide(self): # use this when you want to clear the window
+        self.logo_sprite.batch = None
+
+        self.play_button.hide()
+        self.settings_button.hide()
+        self.exit_button.hide()
+
+        self.isHidden = True
+
+    def show(self): # use this when you want to use the window for the main menu
+        self.logo_sprite.batch = self.batch
+
+        self.play_button.show()
+        self.settings_button.show()
+        self.exit_button.show()
+
+        self.isHidden = False
