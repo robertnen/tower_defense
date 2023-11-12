@@ -8,8 +8,10 @@ A 2D game made in Python using Pyglet
 - [x] Find / Make textures or images
 - [ ] Make the main Menu
     - [x] Make an "exit" button
-    - [ ] Make a "settings" button
-    - [ ] Make a "play" button
+    - [x] Make a "settings" button
+    - [x] Make a "play" button
+    - [ ] Finish the settings
+    - [ ] Add background
 - [ ] Make a map reader
 - [ ] Make a map drawer
 - [ ] Make them so they can be upgraded
