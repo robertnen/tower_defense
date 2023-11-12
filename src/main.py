@@ -15,8 +15,8 @@ pyglet.resource.reindex()
 main_menu = mainMenu.MainMenu()
 # main_menu.set_icon('img/image_test.jpg') # taskbar icon will be added at installer
 
-audio = pyglet.media.load(getFilePath('Main_Menu.wav'))
-# audio = pyglet.media.load(getFilePath('Level_1.wav'))
+# audio = pyglet.media.load(getFilePath('Main_Menu.wav'))
+audio = pyglet.media.load(getFilePath('Level_3.wav'))
 
 player = pyglet.media.Player()
 player.queue(audio)
