@@ -1,14 +1,12 @@
-import pyglet
-
-from src.constant import *
+import constant
 
 
 class Map:
-    height = HEIGHT_MAP
-    width = WIDTH_MAP
+    height = constant.HEIGHT_MAP
+    width = constant.WIDTH_MAP
 
-    xStart = X_START_MAP     # coords of starting position
-    yStart = Y_START_MAP
+    xStart = constant.X_START_MAP     # coords of starting position
+    yStart = constant.Y_START_MAP
 
     matrix = None
     pathfile = None
@@ -30,10 +28,10 @@ class Map:
         return -1  # invalid map
 
     def dfs(self, i: int, j: int):
-        if i < 0 or i >= LINE:
+        if i < 0 or i >= constant.LINE:
             return False
 
-        if j < 0 or j >= COLUMN:
+        if j < 0 or j >= constant.COLUMN:
             return False
 
         if self.visited[i][j]:
@@ -86,13 +84,13 @@ class Map:
             print('Invalid map (no start nor destination)')
             self.isValid = False
 
-        if DEBUG or DEBUG_MAP_READER: # map debug
+        if constant.DEBUG or constant.DEBUG_MAP_READER: # map debug
             print(f'Pathfile = {self.pathfile}')
             print(f'isValid = {self.isValid}')
             print(f'Start = {self.start} End = {self.destination}')
             print('Map char:')
-            for i in range(LINE):
-                for j in range(COLUMN):
+            for i in range(constant.LINE):
+                for j in range(constant.COLUMN):
                     print(self.matrix[i][j], end = ' ')
                 print()
 
