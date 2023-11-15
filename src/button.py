@@ -15,6 +15,7 @@ class Button():
 
     def __init__(self, name : str, color : str, x : int, y : int, batch : pyglet.graphics.Batch):
 
+        # gameUtils.getFilePath('grey_button.png', '\\assets\img\\')
         self.image = pyglet.image.load(gameUtils.getFilePath(color + constant.BUTTON, constant.TYPE_IMAGE))
 
         self.sprite = pyglet.sprite.Sprite(self.image, x = x, y = y, z = 100, batch = batch)

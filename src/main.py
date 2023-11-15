@@ -7,6 +7,7 @@ from pyglet.window import key
 from pyglet.window import mouse
 
 
+# do not change
 pyglet.resource.path = ["../assets"] # assets needs to be the default resource directory
 pyglet.resource.reindex()
 
@@ -18,6 +19,7 @@ player.queue(pyglet.media.load(gameUtils.getFilePath('Main_Menu.wav', constant.T
 player.volume = 0.3
 player.play()
 player.loop = True
+# this
 
 # map = map.Map(constant.MAP1_PATH)
 
