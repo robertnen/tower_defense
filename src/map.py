@@ -1,36 +1,55 @@
-# ecran de 1600 x 900
-# un dreptunghi format din patrate de 80 x 80
-# matrice bordata de cifra 3
-# functie care valideaza mapa
-# functie care citeste matricea si o retine
-# 9 patrate latime, 18 patrate lungime
-import os
-import os.path
+import pyglet
+
+from src.constant import *
 
 
 class Map:
+    height = HEIGHT_MAP
+    width = WIDTH_MAP
+
+    xStart = X_START_MAP     # coords of starting position
+    yStart = Y_START_MAP
+
+    matrix = None
+    pathfile = None
+
+    isValid = True           # if the map is valid or not
+
     def find_start(self):
         for i in range(len(self.matrix)):
             for j in range(len(self.matrix[i])):
                 if self.matrix[i][j] == 4:
                     return i, j
+        return -1  # invalid map
 
     def find_destination(self):
         for i in range(len(self.matrix)):
             for j in range(len(self.matrix[i])):
                 if self.matrix[i][j] == 5:
                     return i, j
+        return -1  # invalid map
 
-    def dfs(self, i, j):
-        if not (0 <= i < len(self.matrix) and 0 <= j < len(self.matrix[0])) or self.visited[i][j]:
+    def dfs(self, i: int, j: int):
+        if i < 0 or i >= LINE:
             return False
+
+        if j < 0 or j >= COLUMN:
+            return False
+
+        if self.visited[i][j]:
+            return False
+
         if self.matrix[i][j] == 5:
             return True
+
         if self.matrix[i][j] not in [0, 4]:
             return False
+
         self.visited[i][j] = True
-        if self.dfs(i, j+1) or self.dfs(i+1, j) or self.dfs(i, j-1) or self.dfs(i-1, j):
+
+        if self.dfs(i, j + 1) or self.dfs(i + 1, j) or self.dfs(i, j - 1) or self.dfs(i - 1, j):
             return True
+
         self.visited[i][j] = False  # unmark the cell before returning False
         return False
 
@@ -41,8 +60,8 @@ class Map:
                 if False in row:  # if there's a cell that hasn't been visited
                     return False
         return True
-    
-    def read_matrix_from_file(self, filepath):
+
+    def read_matrix(self, filepath):
         matrix = []
         with open(filepath, 'r') as file:
             for line in file:
@@ -51,19 +70,34 @@ class Map:
                 matrix.append(row)
         return matrix
 
-    def __init__(self):
-        self.height = 720
-        self.width = 1440
-        self.xStart = 100
-        self.yStart = 100
-        self.pathfile = os.path.abspath('map1.txt')
-        self.matrix = self.read_matrix_from_file(self.pathfile)
+    def __init__(self, map_path):
+
+        self.pathfile = map_path
+        self.matrix = self.read_matrix(map_path)
+
+        if not self.matrix:
+            print('Invalid map (null matrix)')
+            self.isValid = False
+
         self.start = self.find_start()
         self.destination = self.find_destination()
+
+        if self.start == -1 or self.destination == -1:
+            print('Invalid map (no start nor destination)')
+            self.isValid = False
+
+        if DEBUG or DEBUG_MAP_READER: # map debug
+            print(f'Pathfile = {self.pathfile}')
+            print(f'isValid = {self.isValid}')
+            print(f'Start = {self.start} End = {self.destination}')
+            print('Map char:')
+            for i in range(LINE):
+                for j in range(COLUMN):
+                    print(self.matrix[i][j], end = ' ')
+                print()
+
         self.visited = [[False for _ in range(len(self.matrix[0]))] for _ in range(len(self.matrix))]
 
-
-map = Map()
-for row in map.matrix:
-    print(row)
-print(map.check_path_exists())
+        if not self.dfs(self.start[0], self.start[1]):
+            print('Invalid map (no path from start to destination)')
+            self.isValid = False
