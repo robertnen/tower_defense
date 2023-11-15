@@ -56,7 +56,7 @@ class Map:
         self.width = 1440
         self.xStart = 100
         self.yStart = 100
-        self.pathfile = 'C:\\Users\\Adelin\\Desktop\\tower_defense\\maps\\map1.txt'
+        self.pathfile = os.path.abspath('map1.txt')
         self.matrix = self.read_matrix_from_file(self.pathfile)
         self.start = self.find_start()
         self.destination = self.find_destination()
