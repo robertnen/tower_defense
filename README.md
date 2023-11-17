@@ -1,4 +1,4 @@
-# tower_defense
+# Tower_defense
 A 2D game made in Python using Pyglet
 
 # Objectives:
@@ -14,10 +14,12 @@ A 2D game made in Python using Pyglet
     - [ ] Add background
 - [ ] Make a map reader
 - [ ] Make a map drawer
-- [ ] Make them so they can be upgraded
-- [ ] Define enemies
 - [ ] Define buildings
+- [ ] Define enemies
 - [ ] Make buildings to attack enemies
+- [ ] Make them so they can be upgraded
 - [ ] Make small animations
+- [ ] Add "money" in the game
+- [ ] Make a buy buildings menu (shop)
 - [ ] Finish the README.md
 - [ ] Do a small Wiki page
