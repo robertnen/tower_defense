@@ -1,5 +1,5 @@
 import constant
-
+import gameUtils
 
 class Map:
     height = constant.HEIGHT_MAP
@@ -70,8 +70,8 @@ class Map:
 
     def __init__(self, map_path):
 
-        self.pathfile = map_path
-        self.matrix = self.read_matrix(map_path)
+        self.pathfile = gameUtils.getFilePath(map_path, constant.TYPE_MAP)
+        self.matrix = self.read_matrix(self.pathfile)
 
         if not self.matrix:
             print('Invalid map (null matrix)')

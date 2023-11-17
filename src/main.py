@@ -6,7 +6,6 @@ import map
 from pyglet.window import key
 from pyglet.window import mouse
 
-
 # do not change
 pyglet.resource.path = ["../assets"] # assets needs to be the default resource directory
 pyglet.resource.reindex()
@@ -21,9 +20,9 @@ player.play()
 player.loop = True
 # this
 
-# map = map.Map(constant.MAP1_PATH)
+map = map.Map(constant.MAP1_PATH)
 
-# if not map.isValid:
-    # exit(1)
+if not map.isValid:
+    exit(1)
 
 pyglet.app.run(1 / 144) # 144 Hz

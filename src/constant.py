@@ -19,6 +19,7 @@ LOGO_HEIGHT = 200
 # used for getFilePath second argument
 TYPE_IMAGE = '\\assets\img\\'
 TYPE_SONG = '\\assets\songs\\'
+TYPE_MAP = '\\assets\maps\\'
 
 # text for main menu buttons
 PLAY = 'Play'
@@ -53,4 +54,4 @@ WIDTH_MAP = 1440
 HEIGHT_MAP = 720
 X_START_MAP = 100
 Y_START_MAP = 100
-MAP1_PATH = '../maps/map1.txt'
+MAP1_PATH = 'map1.txt'
