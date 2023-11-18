@@ -1,6 +1,7 @@
 import pyglet
 import button
 import constant
+import option
 from pyglet.window import key
 from pyglet.window import mouse
 
@@ -32,6 +33,17 @@ class MainMenu():
     settings_button = None
 
     isHidden = False                # used for mouse / keys events
+
+    # for settings
+    music_label = None
+    sfx_label = None
+
+    music_bar = None
+    sfx_bar = None
+
+    back_button = None
+
+    isHiddenSettings = True         # the settings tab is hidden by default
 
     def __init__(self):
         self.win = pyglet.window.Window(fullscreen = True, caption = constant.GAME_TITLE)
@@ -66,6 +78,28 @@ class MainMenu():
 
         self.exit_button = button.Button(constant.EXIT, constant.GREY,
                                          self.width / 2 - 150, self.height / 2 - 200, self.batch)
+
+        # define settings tab
+        self.music_label = option.Option(constant.MUSIC, self.width / 2 - 330, self.height / 2 + 60, self.batch)
+        self.sfx_label = option.Option(constant.SFX, self.width / 2 - 330, self.height / 2 - 60, self.batch)
+
+        self.music_bar = pyglet.sprite.Sprite(pyglet.resource.image('img/3' + constant.BAR),
+                                              x = self.music_label.x + 50 + constant.TEXT_BG_WIDTH,
+                                              y = self.music_label.y - 9,
+                                              z = 100,
+                                              batch = self.batch)
+
+        self.sfx_bar = pyglet.sprite.Sprite(pyglet.resource.image('img/3' + constant.BAR),
+                                              x = self.sfx_label.x + 50 + constant.TEXT_BG_WIDTH,
+                                              y = self.sfx_label.y - 9,
+                                              z = 100,
+                                              batch = self.batch)
+
+        self.back_button = button.Button(constant.BACK, constant.GREY,
+                                         self.width / 2 - 150, self.height / 2 - 200, self.batch)
+
+        # I don't want to see the settings tab from the start
+        self.hideSet()
 
         # override win events for main menu
         @self.win.event
@@ -120,6 +154,13 @@ class MainMenu():
 
                     self.exit_func() # the user wants to leave the game
 
+            # if in menu settings
+            if self.isHiddenSettings == False:
+                if isInRect(x, y, self.back_button.x, self.back_button.y, self.back_button):
+                    if constant.DEBUG:
+                        print('Back to main menu button pressed')
+                self.menu_func()
+
         @self.win.event
         def on_mouse_motion(x, y, dx, dy):
             if constant.DEBUG or constant.DEBUG_MOUSE:
@@ -131,26 +172,33 @@ class MainMenu():
                 isInRect(x, y, self.settings_button.x, self.settings_button.y, self.settings_button)
                 isInRect(x, y, self.exit_button.x, self.exit_button.y, self.exit_button)
 
+            # if in menu settings
+            if self.isHiddenSettings == False:
+                isInRect(x, y, self.back_button.x, self.back_button.y, self.back_button)
+
         @self.win.event
         def on_close():
-            print('The main menu window was closed')
+            print('The game was closed')
             pyglet.app.exit()
 
     def set_icon(self, filePath : str):
         icon = pyglet.resource.image(filePath)
         self.win.set_icon(icon)
 
+    def menu_func(self):
+        self.hideSet()
+        self.show()
+
     def play_func(self):
         pass
 
     def settings_func(self):
-        pass
+        self.hide()
+        self.showSet()
+        # self.bg_sprite.batch = self.batch
 
     def exit_func(self):
         self.win.on_close()
-
-    def addBackground(self):
-        pass
 
     def hide(self): # use this when you want to clear the window
         self.logo_sprite.batch = None
@@ -171,3 +219,25 @@ class MainMenu():
         self.exit_button.show()
 
         self.isHidden = False
+
+    def hideSet(self): # used for settings tab
+        self.music_label.hide()
+        self.music_bar.batch = None
+
+        self.sfx_label.hide()
+        self.sfx_bar.batch = None
+
+        self.back_button.hide()
+
+        self.isHiddenSettings = True
+
+    def showSet(self): # used for settings tab
+        self.music_label.show()
+        self.music_bar.batch = self.batch
+
+        self.sfx_label.show()
+        self.sfx_bar.batch = self.batch
+
+        self.back_button.show()
+
+        self.isHiddenSettings = False
