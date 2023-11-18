@@ -37,11 +37,13 @@ EXIT = 'Exit'
 # text for settings
 MUSIC = 'Music'
 SFX = 'Sounds'
-BACK = 'Back to main menu'
+BACK = 'Main menu'
 
 # used for button class and for the volume bars
 BUTTON = '_button.png'
 BAR = '_bar.png'
+BAR_WIDTH = 120
+BAR_HEIGHT = 120
 
 # to get a building just write gameUtils.getFilePath(COLOR + SHAPE, constant.TYPE_IMAGE)
 
