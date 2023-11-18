@@ -2,6 +2,7 @@ import pyglet
 import button
 import constant
 import option
+import gameUtils
 from pyglet.window import key
 from pyglet.window import mouse
 
@@ -12,6 +13,19 @@ def isInRect(x, y, tx, ty, button: button.Button): # animates the buttons
             return True
     else:
             button.setSpriteColor(constant.GREY)
+            return False
+
+def isInSquare(x, y, tx, ty, bar: pyglet.sprite.Sprite, level: int):
+    if x >= tx and x <= tx + constant.BAR_WIDTH and \
+        y >= ty and y <= ty + constant.BAR_HEIGHT:
+            if level >= 5: # from 100% to 0%
+                level = 0
+            else:
+                level = level + 1
+
+            bar.image = pyglet.resource.image('img/' + str(level) + constant.BAR)
+            return True
+    else:
             return False
 
 class MainMenu():
@@ -41,9 +55,14 @@ class MainMenu():
     music_bar = None
     sfx_bar = None
 
+    music_level = 3
+    sfx_level = 3
+
     back_button = None
 
     isHiddenSettings = True         # the settings tab is hidden by default
+
+    player = pyglet.media.Player()
 
     def __init__(self):
         self.win = pyglet.window.Window(fullscreen = True, caption = constant.GAME_TITLE)
@@ -83,13 +102,13 @@ class MainMenu():
         self.music_label = option.Option(constant.MUSIC, self.width / 2 - 330, self.height / 2 + 60, self.batch)
         self.sfx_label = option.Option(constant.SFX, self.width / 2 - 330, self.height / 2 - 60, self.batch)
 
-        self.music_bar = pyglet.sprite.Sprite(pyglet.resource.image('img/3' + constant.BAR),
+        self.music_bar = pyglet.sprite.Sprite(pyglet.resource.image('img/' + str(self.music_level) + constant.BAR),
                                               x = self.music_label.x + 50 + constant.TEXT_BG_WIDTH,
                                               y = self.music_label.y - 9,
                                               z = 100,
                                               batch = self.batch)
 
-        self.sfx_bar = pyglet.sprite.Sprite(pyglet.resource.image('img/3' + constant.BAR),
+        self.sfx_bar = pyglet.sprite.Sprite(pyglet.resource.image('img/' + str(self.sfx_level) + constant.BAR),
                                               x = self.sfx_label.x + 50 + constant.TEXT_BG_WIDTH,
                                               y = self.sfx_label.y - 9,
                                               z = 100,
@@ -98,8 +117,14 @@ class MainMenu():
         self.back_button = button.Button(constant.BACK, constant.GREY,
                                          self.width / 2 - 150, self.height / 2 - 200, self.batch)
 
-        # I don't want to see the settings tab from the start
+        # settings tab are hidden by default
         self.hideSet()
+
+        self.player.queue(pyglet.media.load(gameUtils.getFilePath('Main_Menu.wav', constant.TYPE_SONG)))
+
+        self.player.volume = 0.5
+        self.player.play()
+        self.player.loop = True
 
         # override win events for main menu
         @self.win.event
@@ -159,7 +184,24 @@ class MainMenu():
                 if isInRect(x, y, self.back_button.x, self.back_button.y, self.back_button):
                     if constant.DEBUG:
                         print('Back to main menu button pressed')
-                self.menu_func()
+                    self.menu_func()
+
+                if isInSquare(x, y, self.music_bar.x, self.music_bar.y, self.music_bar, self.music_level) == True:
+
+                    if self.music_level >= 5:
+                        self.music_level = 0
+                    else:
+                        self.music_level = self.music_level + 1
+
+                    self.player.volume = gameUtils.volumes(self.music_level)
+
+                if isInSquare(x, y, self.sfx_bar.x, self.sfx_bar.y, self.sfx_bar, self.sfx_level) == True:
+                    if self.sfx_level >= 5:
+                        self.sfx_level = 0
+                    else:
+                        self.sfx_level = self.sfx_level + 1
+
+                    # TODO: add here player for sfx if needed
 
         @self.win.event
         def on_mouse_motion(x, y, dx, dy):
@@ -186,16 +228,16 @@ class MainMenu():
         self.win.set_icon(icon)
 
     def menu_func(self):
-        self.hideSet()
-        self.show()
+        self.hideSet()                      # hide the settings tab
+        self.show()                         # show the main menu tab
 
     def play_func(self):
-        pass
+        pass                                # TODO: implement here the game
 
     def settings_func(self):
-        self.hide()
-        self.showSet()
-        # self.bg_sprite.batch = self.batch
+        self.hide()                         # hide the main menu tab
+        self.showSet()                      # show the settings tab
+        self.bg_sprite.batch = self.batch   # keep the background for the settings tab
 
     def exit_func(self):
         self.win.on_close()
