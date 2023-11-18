@@ -16,6 +16,9 @@ LOGO_PATH = 'img/tower_defense.png'
 LOGO_WIDTH = 600
 LOGO_HEIGHT = 200
 
+# background of the logo title
+BG_PATH = 'img/main_menu_background.png'
+
 # used for getFilePath second argument
 TYPE_IMAGE = '\\assets\img\\'
 TYPE_SONG = '\\assets\songs\\'

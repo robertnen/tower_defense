@@ -4,7 +4,7 @@ import constant
 from pyglet.window import key
 from pyglet.window import mouse
 
-def isInRect(x, y, tx, ty, button : button.Button): # animates the buttons
+def isInRect(x, y, tx, ty, button: button.Button): # animates the buttons
     if x >= tx and x <= tx + constant.MM_BUTTON_WIDTH and \
         y >= ty and y <= ty + constant.MM_BUTTON_HEIGHT:
             button.setSpriteColor(constant.LIGHT_GREY)
@@ -16,19 +16,22 @@ def isInRect(x, y, tx, ty, button : button.Button): # animates the buttons
 class MainMenu():
     win = None
 
-    logo_img = None     # logo
+    logo_img = None                 # logo
     logo_sprite = None
 
-    batch = None        # used for graphics
+    bg_img = None                   # background
+    bg_sprite = None
 
-    width = None        # of window
-    height = None       # of window
+    batch = None                    # used for graphics
+
+    width = None                    # of window
+    height = None                   # of window
 
     play_button = None
     exit_button = None
     settings_button = None
 
-    isHidden = False    # used for mouse / keys events
+    isHidden = False                # used for mouse / keys events
 
     def __init__(self):
         self.win = pyglet.window.Window(fullscreen = True, caption = constant.GAME_TITLE)
@@ -39,15 +42,22 @@ class MainMenu():
         self.width = self.win.width;
         self.height = self.win.height;
 
-        # define main menu logo
+        # define main menu logo and background
         self.logo_img = pyglet.resource.image(constant.LOGO_PATH)
+        self.bg_img = pyglet.resource.image(constant.BG_PATH)
+
+        self.bg_img.width = self.width
+        self.bg_img.height = self.height
 
         self.logo_img.width = constant.LOGO_WIDTH
         self.logo_img.height = constant.LOGO_HEIGHT
 
-        self.logo_sprite = pyglet.sprite.Sprite(self.logo_img, x = self.width / 2 - 300, y = self.height / 2 + 80,
+        self.bg_sprite = pyglet.sprite.Sprite(self.bg_img, x = 0, y = 0, z = 96, batch = self.batch)
+
+        self.logo_sprite = pyglet.sprite.Sprite(self.logo_img, x = self.width / 2 - 300, y = self.height / 2 + 80, z = 98,
                                                 batch = self.batch)
 
+        # define buttons
         self.play_button = button.Button(constant.PLAY, constant.GREY,
                                          self.width / 2 - 150, self.height / 2, self.batch)
 
@@ -57,6 +67,7 @@ class MainMenu():
         self.exit_button = button.Button(constant.EXIT, constant.GREY,
                                          self.width / 2 - 150, self.height / 2 - 200, self.batch)
 
+        # override win events for main menu
         @self.win.event
         def on_draw():
             self.win.clear()
@@ -95,9 +106,13 @@ class MainMenu():
                     if constant.DEBUG:
                         print('Play button pressed')
 
+                    self.play_func()
+
                 if isInRect(x, y, self.settings_button.x, self.settings_button.y, self.settings_button):
                     if constant.DEBUG:
                         print('Settings button pressed')
+
+                    self.settings_func()
 
                 if isInRect(x, y, self.exit_button.x, self.exit_button.y, self.exit_button):
                     if constant.DEBUG:
@@ -125,11 +140,21 @@ class MainMenu():
         icon = pyglet.resource.image(filePath)
         self.win.set_icon(icon)
 
+    def play_func(self):
+        pass
+
+    def settings_func(self):
+        pass
+
     def exit_func(self):
         self.win.on_close()
 
+    def addBackground(self):
+        pass
+
     def hide(self): # use this when you want to clear the window
         self.logo_sprite.batch = None
+        self.bg_sprite.batch = None
 
         self.play_button.hide()
         self.settings_button.hide()
@@ -139,6 +164,7 @@ class MainMenu():
 
     def show(self): # use this when you want to use the window for the main menu
         self.logo_sprite.batch = self.batch
+        self.bg_sprite.batch = self.batch
 
         self.play_button.show()
         self.settings_button.show()
