@@ -6,13 +6,13 @@ A 2D game made in Python using Pyglet
 - [x] Find songs for the game
 - [x] Find good sfx sounds
 - [x] Find / Make textures or images
-- [ ] Make the main Menu
+- [x] Make the main Menu
     - [x] Make an "exit" button
     - [x] Make a "settings" button
     - [x] Make a "play" button
-    - [ ] Finish the settings
+    - [x] Finish the settings
     - [x] Add background
-- [ ] Make a map reader
+- [x] Make a map reader
 - [ ] Make a map drawer
 - [ ] Define buildings
 - [ ] Define enemies
