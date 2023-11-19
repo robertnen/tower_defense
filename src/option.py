@@ -2,7 +2,7 @@ import pyglet
 import gameUtils
 import constant
 
-class Button():
+class Option():
     x = None        # coords
     y = None
 
@@ -13,19 +13,19 @@ class Button():
 
     batch = None    # graphics
 
-    def __init__(self, name: str, color: str, x: int, y: int, batch: pyglet.graphics.Batch):
+    def __init__(self, name: str, x: int, y: int, batch: pyglet.graphics.Batch):
 
         # gameUtils.getFilePath('grey_button.png', '\\assets\img\\')
-        self.image = pyglet.image.load(gameUtils.getFilePath(color + constant.BUTTON, constant.TYPE_IMAGE))
+        self.image = pyglet.image.load(gameUtils.getFilePath(constant.TEXT_BG_PATH, constant.TYPE_IMAGE))
 
-        self.sprite = pyglet.sprite.Sprite(self.image, x = x, y = y, z = 100, batch = batch)
+        self.sprite = pyglet.sprite.Sprite(self.image, x = x, y = y, z = 101, batch = batch)
 
         self.label = pyglet.text.Label(name,
                                        font_name = 'Times New Roman',
                                        font_size = 28,
                                        x = x + 150,
-                                       y = y + 30,
-                                       z = 99,
+                                       y = y + 25,
+                                       z = 100,
                                        anchor_x = 'center', anchor_y = 'center',
                                        batch = batch)
 
@@ -33,12 +33,6 @@ class Button():
         self.y = y
 
         self.batch = batch
-
-    def setSpriteColor(self, color : str):
-        image = pyglet.image.load(gameUtils.getFilePath(color + constant.BUTTON, constant.TYPE_IMAGE))
-
-        self.sprite.image = image
-        self.image = image
 
     def hide(self):
         self.sprite.batch = None

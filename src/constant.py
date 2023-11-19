@@ -16,6 +16,14 @@ LOGO_PATH = 'img/tower_defense.png'
 LOGO_WIDTH = 600
 LOGO_HEIGHT = 200
 
+# background of the logo title
+BG_PATH = 'img/main_menu_background.png'
+
+# background of the options
+TEXT_BG_PATH = 'text_bg.png'
+TEXT_BG_WIDTH = 300
+TEXT_BG_HEIGHT = 50
+
 # used for getFilePath second argument
 TYPE_IMAGE = '\\assets\img\\'
 TYPE_SONG = '\\assets\songs\\'
@@ -26,8 +34,16 @@ PLAY = 'Play'
 SETTINGS = 'Settings'
 EXIT = 'Exit'
 
-# used for button class
+# text for settings
+MUSIC = 'Music'
+SFX = 'Sounds'
+BACK = 'Main menu'
+
+# used for button class and for the volume bars
 BUTTON = '_button.png'
+BAR = '_bar.png'
+BAR_WIDTH = 120
+BAR_HEIGHT = 120
 
 # to get a building just write gameUtils.getFilePath(COLOR + SHAPE, constant.TYPE_IMAGE)
 

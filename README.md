@@ -11,7 +11,7 @@ A 2D game made in Python using Pyglet
     - [x] Make a "settings" button
     - [x] Make a "play" button
     - [ ] Finish the settings
-    - [ ] Add background
+    - [x] Add background
 - [ ] Make a map reader
 - [ ] Make a map drawer
 - [ ] Define buildings
