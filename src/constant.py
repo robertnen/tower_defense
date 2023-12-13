@@ -2,6 +2,7 @@
 DEBUG = False                   # change to true if you want to get info from everything
 DEBUG_KEYS = False              # change to true if you want to get info from mouse
 DEBUG_MOUSE = False             # change to true if you want to get info from keyboard
+DEBUG_ENEMY = False             # change to true if you want to get info from enemy class
 DEBUG_MAP_READER = False        # change to true if you want to get info from map reader
 
 # used for buttons (for now on main menu)
@@ -71,3 +72,10 @@ HEIGHT_MAP = 720
 X_START_MAP = 100
 Y_START_MAP = 100
 MAP1_PATH = 'map1.txt'
+
+# enemy
+ENEMY = "_enemy"
+ENEMY_SPEED = 0.5
+ENEMY_RED_HP = 300
+ENEMY_BLUE_HP = 200
+ENEMY_YELLOW_HP = 100
