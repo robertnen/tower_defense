@@ -3,6 +3,7 @@ DEBUG = False                   # change to true if you want to get info from ev
 DEBUG_KEYS = False              # change to true if you want to get info from mouse
 DEBUG_MOUSE = False             # change to true if you want to get info from keyboard
 DEBUG_ENEMY = False             # change to true if you want to get info from enemy class
+DEBUG_BUILDING = False          # change to true if you want to get info from building class
 DEBUG_MAP_READER = False        # change to true if you want to get info from map reader
 
 # used for buttons (for now on main menu)
@@ -79,3 +80,14 @@ ENEMY_SPEED = 0.5
 ENEMY_RED_HP = 300
 ENEMY_BLUE_HP = 200
 ENEMY_YELLOW_HP = 100
+
+# to get a building just write gameUtils.getFilePath(COLOR + SHAPE, constant.TYPE_IMAGE)
+
+# building
+BUILDING_RED_COOLDOWN = 1
+BUILDING_BLUE_COOLDOWN = 2
+BUILDING_YELLOW_COOLDOWN = 3
+
+BUILDING_RED_RADIUS = 3
+BUILDING_BLUE_RADIUS = 4
+BUILDING_YELLOW_RADIUS = 5
