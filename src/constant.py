@@ -75,7 +75,7 @@ Y_START_MAP = 100
 MAP1_PATH = 'map1.txt'
 
 # enemy
-ENEMY = "_enemy"
+ENEMY = "_enemy.png"
 ENEMY_SPEED = 0.5
 ENEMY_RED_HP = 300
 ENEMY_BLUE_HP = 200
@@ -91,3 +91,14 @@ BUILDING_YELLOW_COOLDOWN = 3
 BUILDING_RED_RADIUS = 3
 BUILDING_BLUE_RADIUS = 4
 BUILDING_YELLOW_RADIUS = 5
+
+# textures of ground
+BORDER = 'img/border.png'
+ENEMY_BASE = 'img/enemy_base.png'
+PLAYER_BASE = 'img/player_base.png'
+ENEMY_PATH = 'img/enemy_path.png'
+GRASS = 'img/grass.png'
+SAND = 'img/sand.png'
+
+# cyan background
+BACKGROUND = 'img/background.png'
