@@ -201,8 +201,6 @@ class MainMenu():
                     else:
                         self.sfx_level = self.sfx_level + 1
 
-                    # TODO: add here player for sfx if needed
-
         @self.win.event
         def on_mouse_motion(x, y, dx, dy):
             if constant.DEBUG or constant.DEBUG_MOUSE:
