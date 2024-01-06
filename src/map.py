@@ -1,5 +1,6 @@
 import constant
 import gameUtils
+import pyglet
 
 class Map:
     height = constant.HEIGHT_MAP
@@ -13,17 +14,21 @@ class Map:
 
     isValid = True           # if the map is valid or not
 
+    batch = None
+    imgs = [[None for _ in range(constant.COLUMN)] for _ in range(constant.LINE)]
+    bgs = None
+
     def find_start(self):
         for i in range(len(self.matrix)):
             for j in range(len(self.matrix[i])):
-                if self.matrix[i][j] == 4:
+                if self.matrix[i][j] == 5:
                     return i, j
         return -1  # invalid map
 
     def find_destination(self):
         for i in range(len(self.matrix)):
             for j in range(len(self.matrix[i])):
-                if self.matrix[i][j] == 5:
+                if self.matrix[i][j] == 4:
                     return i, j
         return -1  # invalid map
 
@@ -68,8 +73,9 @@ class Map:
                 matrix.append(row)
         return matrix
 
-    def __init__(self, map_path):
+    def __init__(self, map_path, batch: pyglet.graphics.Batch):
 
+        self.batch = batch
         self.pathfile = gameUtils.getFilePath(map_path, constant.TYPE_MAP)
         self.matrix = self.read_matrix(self.pathfile)
 
@@ -99,3 +105,53 @@ class Map:
         if not self.dfs(self.start[0], self.start[1]):
             print('Invalid map (no path from start to destination)')
             self.isValid = False
+
+    def drawMap(self):
+        if constant.DEBUG or constant.DEBUG_MAP_READER:
+            print("Map matrix: ")
+            for i in range(0, constant.LINE):
+                print(self.matrix[i])
+
+        for y in range(0, constant.LINE):
+            for x in range(0, constant.COLUMN):
+
+                bg = pyglet.resource.image(constant.BACKGROUND)
+                self.bgs = pyglet.sprite.Sprite(bg, x = 0, y = 0, z = 149, batch = self.batch)
+                self.bgs.scale = 16 / 9
+
+                img = None
+
+                match self.matrix[y][x]:
+                    case 0:
+                        img = pyglet.resource.image(constant.ENEMY_PATH)
+                    case 1:
+                        img = pyglet.resource.image(constant.SAND)
+                    case 2:
+                        img = pyglet.resource.image(constant.GRASS)
+                    case 3:
+                        img = pyglet.resource.image(constant.BORDER)
+                    case 4:
+                        img = pyglet.resource.image(constant.PLAYER_BASE)
+                    case 5:
+                        img = pyglet.resource.image(constant.ENEMY_BASE)
+                    case _:
+                        print('Map corrupted in-game')
+
+                self.imgs[y][x] = pyglet.sprite.Sprite(img, x = 160 + x * 80, y = 170 + (constant.LINE - 1 - y) * 80, z = 150, batch = self.batch)
+
+                if constant.DEBUG or constant.DEBUG_MAP_READER:
+                    print(f'(i, j) = ({y}, {x}) -> (x, y) = ({160 + x * 80}, {110 + y * 80})')
+
+    def hide(self):
+        for y in range(constant.LINE):
+            for x in range(constant.COLUMN):
+                self.imgs[y][x].batch = None
+
+        self.bgs.batch = None
+
+    def show(self):
+        for y in range(constant.LINE):
+            for x in range(constant.COLUMN):
+                self.imgs[y][x].batch = self.batch
+
+        self.bgs.batch = self.batch
