@@ -13,13 +13,11 @@ A 2D game made in Python using Pyglet
     - [x] Finish the settings
     - [x] Add background
 - [x] Make a map reader
-- [ ] Make a map drawer
-- [ ] Define buildings
-- [ ] Define enemies
+- [x] Make a map drawer
+- [x] Define buildings
+- [x] Define enemies
 - [ ] Make buildings to attack enemies
 - [ ] Make them so they can be upgraded
 - [ ] Make small animations
-- [ ] Add "money" in the game
-- [ ] Make a buy buildings menu (shop)
 - [ ] Finish the README.md
 - [ ] Do a small Wiki page
