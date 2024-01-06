@@ -30,12 +30,19 @@ class Enemy():
         self.z = z
         self.batch = batch
 
+        self.image = pyglet.resource.image('img/' + color + constant.ENEMY)
+
+        self.sprite = pyglet.sprite.Sprite(self.image, x = 160 + x * 80 + 20, y = 170 + (constant.LINE - 1 - y) * 80 + 20, z = z, batch = self.batch)
+
+        if constant.DEBUG or constant.DEBUG_ENEMY:
+            print(f'(i, j) = ({y}, {x}) -> (x, y) -> ({160 + x * 80 - 20}, {170 + (constant.LINE - 1 - y) * 80})')
+
         self.visited = [[0 for x in range(COLUMN)] for y in range(LINE)]
 
     # calculate the new coordinates
     def newCoordinates(self, x: int, y: int, matrix: list):
-        i = (x - 200) / 80      # i = line in the matrix
-        j = (y - 130) / 80      # j = column in the matrix
+        i = (x - 160) / 80      # i = line in the matrix
+        j = (820 - y) / 80      # j = column in the matrix
 
         i = round(i)
         j = round(j)
@@ -68,8 +75,8 @@ class Enemy():
             j = j + 1
             isValid = True
 
-        x = 80 * i + 200        # new x(pixel)
-        y = 80 * j + 130        # new y(pixel)
+        x = 80 * i + 160        # new x(pixel)
+        y = 820 - 80 * j        # new y(pixel)
 
         if constant.DEBUG_ENEMY:
             print(f'visited:')
@@ -85,8 +92,8 @@ class Enemy():
 
     def hide(self):
         self.sprite.batch = None
-        self.label.batch = None
+        self.image.batch = None
 
     def show(self):
         self.sprite.batch = self.batch
-        self.label.batch = self.batch
+        self.image.batch = self.batch
