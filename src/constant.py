@@ -29,6 +29,7 @@ TEXT_BG_HEIGHT = 50
 # used for getFilePath second argument
 TYPE_IMAGE = '\\assets\img\\'
 TYPE_SONG = '\\assets\songs\\'
+TYPE_SOUND = '\\assets\sounds\\'
 TYPE_MAP = '\\assets\maps\\'
 
 # text for main menu buttons
@@ -76,10 +77,14 @@ MAP1_PATH = 'map1.txt'
 
 # enemy
 ENEMY = "_enemy.png"
-ENEMY_SPEED = 0.5
-ENEMY_RED_HP = 300
-ENEMY_BLUE_HP = 200
-ENEMY_YELLOW_HP = 100
+ENEMY_SPEED_SLOW = 0.07
+ENEMY_SPEED_NORMAL = 0.09
+ENEMY_SPEED_FAST = 0.11
+ENEMY_RED_HP = 1
+ENEMY_BLUE_HP = 2
+ENEMY_GREEN_HP = 3
+ENEMY_PURPLE_HP = 4
+ENEMY_YELLOW_HP = 5
 
 # to get a building just write gameUtils.getFilePath(COLOR + SHAPE, constant.TYPE_IMAGE)
 
@@ -88,9 +93,9 @@ BUILDING_RED_COOLDOWN = 1
 BUILDING_BLUE_COOLDOWN = 2
 BUILDING_YELLOW_COOLDOWN = 3
 
-BUILDING_RED_RADIUS = 3
-BUILDING_BLUE_RADIUS = 4
-BUILDING_YELLOW_RADIUS = 5
+BUILDING_RED_RADIUS = 50
+BUILDING_BLUE_RADIUS = 100
+BUILDING_YELLOW_RADIUS = 150
 
 # textures of ground
 BORDER = 'img/border.png'
@@ -102,3 +107,10 @@ SAND = 'img/sand.png'
 
 # cyan background
 BACKGROUND = 'img/background.png'
+
+# bullet texture
+BULLET = 'img/bullet.png'
+
+# spawning enemies
+COOLDWON = 5 # seconds
+TOTAL = 40 # 200 / 5 (~ 3 min)
