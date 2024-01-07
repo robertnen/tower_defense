@@ -1,10 +1,15 @@
+import math
+import random
 import pyglet
+from building import Building
 import button
 import constant
+from enemy import Enemy
 import option
 import gameUtils
 from pyglet.window import key
 from pyglet.window import mouse
+from map import Map
 
 def isInRect(x, y, tx, ty, button: button.Button): # animates the buttons
     if x >= tx and x <= tx + constant.MM_BUTTON_WIDTH and \
@@ -27,7 +32,6 @@ def isInSquare(x, y, tx, ty, bar: pyglet.sprite.Sprite, level: int):
             return True
     else:
             return False
-
 class MainMenu():
     win = None
 
@@ -61,8 +65,36 @@ class MainMenu():
     back_button = None
 
     isHiddenSettings = True         # the settings tab is hidden by default
+    isInGame = False                # wait for game to start
+    isClicked = False               # check if building is on the mouse
+    isWin = True                    # chcek if game is won
+
+    map1 = None
+
+    enemies = [None for _ in range(constant.TOTAL)]     # enemies of the game
+    enemies_size = 0
+
+    buildings_preview = [None for _ in range(26)]       # buildings preview
+    buildings_size = 0
+
+    buildings = [None for _ in range(180)]              # buildings
+    b_size = 0
+
+    locations = [[(0, 0), (0, 0), (0, 0)],
+                 [(0, 0), (0, 0), (0, 0)],
+                 [(0, 0), (0, 0), (0, 0)],
+                 [(0, 0), (0, 0), (0, 0)],
+                 [(0, 0), (0, 0), (0, 0)]]               # locations of the preview buildings
+
+    preview = None                  # sprite image of building
+    (ti, tj) = (0, 0)               # location of placeable building
+    tick = 0                        # game ticks
 
     player = pyglet.media.Player()
+    sfx = pyglet.media.Player()
+
+    livesLabel = None
+    lives = 5
 
     def __init__(self):
         self.win = pyglet.window.Window(fullscreen = True, caption = constant.GAME_TITLE)
@@ -126,6 +158,10 @@ class MainMenu():
         self.player.play()
         self.player.loop = True
 
+        self.map1 = Map(constant.MAP1_PATH, self.batch)
+        self.livesLabel = pyglet.text.Label('Number of lives: 5', font_name='Times New Roman', font_size=24,
+                                x=200, y=100, z=200, anchor_x='center', anchor_y='center', batch=None, color=(0, 0, 0, 150))
+
         # override win events for main menu
         @self.win.event
         def on_draw():
@@ -165,18 +201,33 @@ class MainMenu():
                     if constant.DEBUG:
                         print('Play button pressed')
 
+                    self.sfx.delete()
+                    self.sfx = pyglet.media.Player()
+                    self.sfx.queue(pyglet.media.load(gameUtils.getFilePath('button_clicked.wav', constant.TYPE_SOUND)))
+                    self.sfx.volume = gameUtils.volumes(self.sfx_level)
+                    self.sfx.play()
                     self.play_func()
 
                 if isInRect(x, y, self.settings_button.x, self.settings_button.y, self.settings_button):
                     if constant.DEBUG:
                         print('Settings button pressed')
 
+                    self.sfx.delete()
+                    self.sfx = pyglet.media.Player()
+                    self.sfx.queue(pyglet.media.load(gameUtils.getFilePath('button_clicked.wav', constant.TYPE_SOUND)))
+                    self.sfx.volume = gameUtils.volumes(self.sfx_level)
+                    self.sfx.play()
                     self.settings_func()
 
                 if isInRect(x, y, self.exit_button.x, self.exit_button.y, self.exit_button):
                     if constant.DEBUG:
                         print('Exit button pressed')
 
+                    self.sfx.delete()
+                    self.sfx = pyglet.media.Player()
+                    self.sfx.queue(pyglet.media.load(gameUtils.getFilePath('button_clicked.wav', constant.TYPE_SOUND)))
+                    self.sfx.volume = gameUtils.volumes(self.sfx_level)
+                    self.sfx.play()
                     self.exit_func() # the user wants to leave the game
 
             # if in menu settings
@@ -184,6 +235,12 @@ class MainMenu():
                 if isInRect(x, y, self.back_button.x, self.back_button.y, self.back_button):
                     if constant.DEBUG:
                         print('Back to main menu button pressed')
+
+                    self.sfx.delete()
+                    self.sfx = pyglet.media.Player()
+                    self.sfx.queue(pyglet.media.load(gameUtils.getFilePath('button_clicked.wav', constant.TYPE_SOUND)))
+                    self.sfx.volume = gameUtils.volumes(self.sfx_level)
+                    self.sfx.play()
                     self.menu_func()
 
                 if isInSquare(x, y, self.music_bar.x, self.music_bar.y, self.music_bar, self.music_level) == True:
@@ -193,6 +250,12 @@ class MainMenu():
                     else:
                         self.music_level = self.music_level + 1
 
+                    self.sfx.delete()
+                    self.sfx = pyglet.media.Player()
+                    self.sfx.queue(pyglet.media.load(gameUtils.getFilePath('sfx_settings.mp3', constant.TYPE_SOUND)))
+                    self.sfx.volume = gameUtils.volumes(self.sfx_level)
+                    self.sfx.play()
+                    print(gameUtils.volumes(self.music_level))
                     self.player.volume = gameUtils.volumes(self.music_level)
 
                 if isInSquare(x, y, self.sfx_bar.x, self.sfx_bar.y, self.sfx_bar, self.sfx_level) == True:
@@ -200,6 +263,65 @@ class MainMenu():
                         self.sfx_level = 0
                     else:
                         self.sfx_level = self.sfx_level + 1
+
+                    print(gameUtils.volumes(self.sfx_level))
+                    self.sfx.delete()
+                    self.sfx = pyglet.media.Player()
+                    self.sfx.queue(pyglet.media.load(gameUtils.getFilePath('sfx_settings.mp3', constant.TYPE_SOUND)))
+                    self.sfx.volume = gameUtils.volumes(self.sfx_level)
+                    self.sfx.play()
+
+            if self.isInGame == True:
+                shapes = [constant.HEXAGO, constant.SQUARE, constant.TRIANG, constant.TRAPEZ, constant.CIRCLE]
+                colors = ["blue", "yellow", "red"]
+                cooldowns = [constant.BUILDING_BLUE_COOLDOWN, constant.BUILDING_YELLOW_COOLDOWN, constant.BUILDING_RED_COOLDOWN]
+                radii = [constant.BUILDING_BLUE_RADIUS, constant.BUILDING_YELLOW_RADIUS, constant.BUILDING_RED_RADIUS]
+
+                (tx, ty) = (-1, -1)
+                (ti, tj) = (-1, -1)
+
+                for i in range(5):
+                    if (tx, ty) == (-1, -1):
+                        for j in range(3):
+                            (lx, ly) = self.locations[i][j]
+
+                            if x >= lx - 10 and x <= lx + 10 and y >= ly - 10 and y <= ly + 10:
+                                (tx, ty) = (x, y)
+                                (ti, tj) = (i, j)
+                                break
+
+
+                if self.isClicked == False and (tx, ty) != (-1, -1):
+                    (self.ti, self.tj) = (ti, tj)
+                    self.isClicked = True
+                    img = pyglet.resource.image('img/' + colors[tj] + shapes[ti])
+                    self.preview = pyglet.sprite.Sprite(img, x = x, y = y, z = 155, batch = self.batch)
+                elif self.isClicked == True:
+                    self.isClicked = False
+
+                    (tx, ty) = (-1, -1)
+                    for i in range(self.map1.place_size):
+                        (lx, ly) = self.map1.place_b[i]
+
+                        if x >= lx and x <= lx + 80 and y >= ly and y <= ly + 80 and self.buildings[i] == None:
+                            b = Building(colors[self.tj], shapes[self.ti], cooldowns[self.tj], radii[self.tj], lx + 40, ly + 40, 160, self.batch)
+                            self.buildings[i] = b
+                            self.sfx.delete()
+                            self.sfx = pyglet.media.Player()
+                            self.sfx.queue(pyglet.media.load(gameUtils.getFilePath('placed.wav', constant.TYPE_SOUND)))
+                            self.sfx.volume = gameUtils.volumes(self.sfx_level)
+                            self.sfx.play()
+                            (tx, ty) = (x, y)
+
+                    if (tx, ty) == (-1, -1):
+                        self.sfx.delete()
+                        self.sfx = pyglet.media.Player()
+                        self.sfx.queue(pyglet.media.load(gameUtils.getFilePath('cancel.wav', constant.TYPE_SOUND)))
+                        self.sfx.volume = gameUtils.volumes(self.sfx_level)
+                        self.sfx.play()
+
+                    self.preview.batch = None
+                    self.preview = None
 
         @self.win.event
         def on_mouse_motion(x, y, dx, dy):
@@ -216,12 +338,16 @@ class MainMenu():
             if self.isHiddenSettings == False:
                 isInRect(x, y, self.back_button.x, self.back_button.y, self.back_button)
 
+            if self.isClicked == True:
+                self.preview.x = x
+                self.preview.y = y
+
         @self.win.event
         def on_close():
             print('The game was closed')
             pyglet.app.exit()
 
-    def set_icon(self, filePath : str):
+    def set_icon(self, filePath: str):
         icon = pyglet.resource.image(filePath)
         self.win.set_icon(icon)
 
@@ -230,7 +356,21 @@ class MainMenu():
         self.show()                         # show the main menu tab
 
     def play_func(self):
-        pass                                # TODO: implement here the game
+        self.hide()
+        self.isInMenu = False
+
+        self.player.pause()
+
+        self.player.queue(pyglet.media.load(gameUtils.getFilePath('Level_1.wav', constant.TYPE_SONG)))
+        self.player.queue(pyglet.media.load(gameUtils.getFilePath('Level_2.wav', constant.TYPE_SONG)))
+        self.player.queue(pyglet.media.load(gameUtils.getFilePath('Level_3.wav', constant.TYPE_SONG)))
+        self.player.queue(pyglet.media.load(gameUtils.getFilePath('Ending.wav', constant.TYPE_SONG)))
+
+        self.player.volume = gameUtils.volumes(self.music_level)
+        self.player.play()
+        self.player.loop = False
+
+        self.mainGame()
 
     def settings_func(self):
         self.hide()                         # hide the main menu tab
@@ -281,3 +421,164 @@ class MainMenu():
         self.back_button.show()
 
         self.isHiddenSettings = False
+
+    def gameTicks(self, dt):
+        self.tick = self.tick + 1
+
+# functions for the main game
+    def spawnEnemy(self, dt):
+        (y, x) = self.map1.find_start()
+        colors = ["purple", "green", "blue", "yellow", "red"]
+        speeds = [constant.ENEMY_SPEED_SLOW, constant.ENEMY_SPEED_NORMAL, constant.ENEMY_SPEED_FAST]
+        hps = [constant.ENEMY_PURPLE_HP, constant.ENEMY_GREEN_HP, constant.ENEMY_BLUE_HP, constant.ENEMY_YELLOW_HP, constant.ENEMY_RED_HP]
+
+        r1 = random.randint(0, 4)
+        r2 = random.randint(0, 2)
+
+        e = Enemy("name", colors[r1], speeds[r2], hps[r1], x, y, 151, self.batch)
+
+        self.enemies[self.enemies_size] = e
+        self.enemies_size = self.enemies_size + 1
+
+    def moveEnemies(self, dt):
+        for i in range(constant.TOTAL):
+            if self.enemies[i] == None: # enemy dead or didn't spawn yet
+                continue
+
+            e: Enemy
+            e = self.enemies[i]
+
+            x = (e.sprite.x - 180) / 80
+            y = (200 - e.sprite.y) / 80 - 1 + constant.LINE
+
+            (dy, dx) = self.map1.find_destination()
+
+            if dx + dy - x - y <= 0.5:
+                self.enemies[i].hide()
+                self.enemies[i] = None
+                self.lives = self.lives - 1
+                self.livesLabel.text = 'Number of lives: ' + str(self.lives)
+
+                self.sfx.delete()
+                self.sfx = pyglet.media.Player()
+                self.sfx.queue(pyglet.media.load(gameUtils.getFilePath('life_lost.mp3', constant.TYPE_SOUND)))
+                self.sfx.volume = gameUtils.volumes(self.sfx_level)
+                self.sfx.play()
+
+                if self.lives == 0:
+                    self.isWin = False
+                    pyglet.clock.unschedule(self.endGame)
+                    self.endGame(0)
+                continue
+
+            r = e.newCoordinates(e.sprite.x, e.sprite.y, self.map1.matrix)
+
+            if r != -1:
+                (x, y) = r
+                self.enemies[i].tx = x - e.sprite.x
+                self.enemies[i].ty = y - e.sprite.y
+
+            self.enemies[i].sprite.x = self.enemies[i].sprite.x + (int) (self.enemies[i].tx * self.enemies[i].speed)
+            self.enemies[i].sprite.y = self.enemies[i].sprite.y + (int) (self.enemies[i].ty * self.enemies[i].speed)
+
+    def shootEnemies(self, dt):
+        for i in range(self.map1.place_size):
+            if self.buildings[i] != None:
+                (e, j) = self.buildings[i].find_closest_enemy(self.enemies)
+                if e == None:
+                    continue
+
+                self.buildings[i].sprite.rotation = 180 - (int) (math.atan2(e.sprite.y - self.buildings[i].sprite.y, e.sprite.x - self.buildings[i].sprite.x) * 180 / math.pi)
+
+                if self.tick % self.buildings[i].cooldown == 0:
+                    e.hp = e.hp - 1
+                    self.enemies[j] = e
+                    if self.enemies[j].hp <= 0:
+                        self.enemies[j].sprite.batch = None
+                        self.enemies[j] = None
+                        self.sfx.delete()
+                        self.sfx = pyglet.media.Player()
+                        self.sfx.queue(pyglet.media.load(gameUtils.getFilePath('enemy_killed.wav', constant.TYPE_SOUND)))
+                        self.sfx.volume = gameUtils.volumes(self.sfx_level)
+                        self.sfx.play()
+
+    def endGame(self, dt):
+        self.isInGame = False
+        self.isClicked = False
+        if self.preview != None:
+            self.preview.batch = None
+            self.preview = None
+
+        # for i in range(self.buildings_size):
+        #     if self.buildings_preview[i] != None:
+        #         self.buildings_preview[i].batch = None
+        #         self.buildings_preview[i] = None
+
+        # for i in range(180):
+        #     if self.buildings[i] != None:
+        #         self.buildings[i].batch = None
+        #         self.buildings[i] = None
+
+        self.locations = [[(0, 0), (0, 0), (0, 0)],
+                          [(0, 0), (0, 0), (0, 0)],
+                          [(0, 0), (0, 0), (0, 0)],
+                          [(0, 0), (0, 0), (0, 0)],
+                          [(0, 0), (0, 0), (0, 0)]];
+
+        self.tick = 0
+
+        self.sfx.delete()
+        self.sfx = pyglet.media.Player()
+
+        if self.isWin == True:
+            self.livesLabel.text = 'Congrats! You\'ve won the game. Press ESC to exit...'
+            self.sfx.queue(pyglet.media.load(gameUtils.getFilePath('game_won.wav', constant.TYPE_SOUND)))
+        else:
+            self.livesLabel.text = 'You lost the game! Press ESC to exit...'
+            self.sfx.queue(pyglet.media.load(gameUtils.getFilePath('game_lost.mp3', constant.TYPE_SOUND)))
+
+        self.sfx.volume = gameUtils.volumes(self.sfx_level)
+        self.sfx.play()
+
+        # for menu
+        self.player.delete()
+
+        self.player = pyglet.media.Player()
+        self.player.queue(pyglet.media.load(gameUtils.getFilePath('Main_Menu.wav', constant.TYPE_SONG)))
+
+        self.player.volume = gameUtils.volumes(self.music_level)
+        self.player.play()
+        self.player.loop = True
+        self.show()
+        self.play_button.hide()
+        self.settings_button.hide()
+        pyglet.clock.unschedule(self.moveEnemies)
+        pyglet.clock.unschedule(self.gameTicks)
+        pyglet.clock.unschedule(self.shootEnemies)
+
+    def mainGame(self):
+        self.map1.drawMap()
+        self.isInGame = True
+        self.livesLabel.batch = self.batch
+
+        shapes = [constant.HEXAGO, constant.SQUARE, constant.TRIANG, constant.TRAPEZ, constant.CIRCLE]
+        colors = ["blue", "yellow", "red"]
+
+        for i in range(5):
+            for j in range(3):
+                b = Building(colors[j], shapes[i], 1, 1, 1650 + j * 80 + 60, self.height / 2 - 80 + i * 80 + 60, 152, self.batch)
+
+                self.locations[i][j] = (1650 + j * 80 + 60, self.height / 2 - 80 + i * 80 + 60)
+
+                self.buildings_preview[self.buildings_size] = b
+                self.buildings_size = self.buildings_size + 1
+
+        # spawn enemies
+        for i in range(constant.TOTAL):
+            pyglet.clock.schedule_once(self.spawnEnemy, i * 5)
+
+        pyglet.clock.schedule_interval(self.moveEnemies, 0.3)
+        pyglet.clock.schedule_interval(self.gameTicks, 1)
+        pyglet.clock.schedule_interval(self.shootEnemies, 1)
+        pyglet.clock.schedule_once(self.endGame, 300)
+

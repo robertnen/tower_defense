@@ -18,6 +18,9 @@ class Map:
     imgs = [[None for _ in range(constant.COLUMN)] for _ in range(constant.LINE)]
     bgs = None
 
+    place_b = [(0, 0) for _ in range(180)]
+    place_size = 0
+
     def find_start(self):
         for i in range(len(self.matrix)):
             for j in range(len(self.matrix[i])):
@@ -137,10 +140,14 @@ class Map:
                     case _:
                         print('Map corrupted in-game')
 
-                self.imgs[y][x] = pyglet.sprite.Sprite(img, x = 160 + x * 80, y = 170 + (constant.LINE - 1 - y) * 80, z = 150, batch = self.batch)
+                self.imgs[y][x] = pyglet.sprite.Sprite(img, x = 160 + x * 80, y = 180 + (constant.LINE - 1 - y) * 80, z = 150, batch = self.batch)
+
+                if self.matrix[y][x] == 1:
+                    self.place_b[self.place_size] = (160 + x * 80, 180 + (constant.LINE - 1 - y) * 80)
+                    self.place_size = self.place_size + 1
 
                 if constant.DEBUG or constant.DEBUG_MAP_READER:
-                    print(f'(i, j) = ({y}, {x}) -> (x, y) = ({160 + x * 80}, {110 + y * 80})')
+                    print(f'(i, j) = ({y}, {x}) -> (x, y) = ({160 + x * 80}, {180 + y * 80})')
 
     def hide(self):
         for y in range(constant.LINE):

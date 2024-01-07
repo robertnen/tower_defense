@@ -18,6 +18,9 @@ class Enemy():
     sprite = None
     batch = None
 
+    tx = 0
+    ty = 0
+
     visited = None      # visited places
 
     def __init__(self, name: str, color: str, speed: float, hp: int, x: int, y: int, z: int, batch: pyglet.graphics.Batch):
@@ -32,24 +35,24 @@ class Enemy():
 
         self.image = pyglet.resource.image('img/' + color + constant.ENEMY)
 
-        self.sprite = pyglet.sprite.Sprite(self.image, x = 160 + x * 80 + 20, y = 170 + (constant.LINE - 1 - y) * 80 + 20, z = z, batch = self.batch)
+        self.sprite = pyglet.sprite.Sprite(self.image, x = 180 + x * 80, y = 200 + (constant.LINE - 1 - y) * 80, z = z, batch = self.batch)
 
         if constant.DEBUG or constant.DEBUG_ENEMY:
-            print(f'(i, j) = ({y}, {x}) -> (x, y) -> ({160 + x * 80 - 20}, {170 + (constant.LINE - 1 - y) * 80})')
+            print(f'(i, j) = ({y}, {x}) -> (x, y) -> ({180 + x * 80}, {200 + (constant.LINE - 1 - y) * 80})')
 
         self.visited = [[0 for x in range(COLUMN)] for y in range(LINE)]
 
     # calculate the new coordinates
     def newCoordinates(self, x: int, y: int, matrix: list):
-        i = (x - 160) / 80      # i = line in the matrix
-        j = (820 - y) / 80      # j = column in the matrix
+        i = (200 - y) / 80 - 1 + constant.LINE      # i = line in the matrix
+        j = (x - 180) / 80                          # j = column in the matrix
 
         i = round(i)
         j = round(j)
 
         isValid = False
 
-        if constant.DEBUG_ENEMY:
+        if constant.DEBUG or constant.DEBUG_ENEMY:
             print(f'matrix:')
             for k in range(0, constant.LINE):
                 print(matrix[k])
@@ -75,10 +78,10 @@ class Enemy():
             j = j + 1
             isValid = True
 
-        x = 80 * i + 160        # new x(pixel)
-        y = 820 - 80 * j        # new y(pixel)
+        x = 80 * j + 180                              # new x(pixel)
+        y = 200 + (constant.LINE - 1 - i) * 80        # new y(pixel)
 
-        if constant.DEBUG_ENEMY:
+        if constant.DEBUG or constant.DEBUG_ENEMY:
             print(f'visited:')
             for k in range(0, constant.LINE):
                 print(self.visited[k])
