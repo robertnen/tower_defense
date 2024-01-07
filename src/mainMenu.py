@@ -71,7 +71,7 @@ class MainMenu():
 
     map1 = None
 
-    enemies = [None for _ in range(constant.TOTAL)]     # enemies of the game
+    enemies = [None for _ in range(500)]     # enemies of the game
     enemies_size = 0
 
     buildings_preview = [None for _ in range(26)]       # buildings preview
@@ -94,7 +94,7 @@ class MainMenu():
     sfx = pyglet.media.Player()
 
     livesLabel = None
-    lives = 5
+    lives = 1
 
     def __init__(self):
         self.win = pyglet.window.Window(fullscreen = True, caption = constant.GAME_TITLE)
@@ -159,7 +159,7 @@ class MainMenu():
         self.player.loop = True
 
         self.map1 = Map(constant.MAP1_PATH, self.batch)
-        self.livesLabel = pyglet.text.Label('Number of lives: 5', font_name='Times New Roman', font_size=24,
+        self.livesLabel = pyglet.text.Label('Number of lives: 1', font_name='Times New Roman', font_size=24,
                                 x=200, y=100, z=200, anchor_x='center', anchor_y='center', batch=None, color=(0, 0, 0, 150))
 
         # override win events for main menu
@@ -255,7 +255,6 @@ class MainMenu():
                     self.sfx.queue(pyglet.media.load(gameUtils.getFilePath('sfx_settings.mp3', constant.TYPE_SOUND)))
                     self.sfx.volume = gameUtils.volumes(self.sfx_level)
                     self.sfx.play()
-                    print(gameUtils.volumes(self.music_level))
                     self.player.volume = gameUtils.volumes(self.music_level)
 
                 if isInSquare(x, y, self.sfx_bar.x, self.sfx_bar.y, self.sfx_bar, self.sfx_level) == True:
@@ -264,7 +263,6 @@ class MainMenu():
                     else:
                         self.sfx_level = self.sfx_level + 1
 
-                    print(gameUtils.volumes(self.sfx_level))
                     self.sfx.delete()
                     self.sfx = pyglet.media.Player()
                     self.sfx.queue(pyglet.media.load(gameUtils.getFilePath('sfx_settings.mp3', constant.TYPE_SOUND)))
@@ -442,7 +440,7 @@ class MainMenu():
 
     def moveEnemies(self, dt):
         for i in range(constant.TOTAL):
-            if self.enemies[i] == None: # enemy dead or didn't spawn yet
+            if self.enemies[i] is None: # enemy dead or didn't spawn yet
                 continue
 
             e: Enemy
@@ -453,7 +451,7 @@ class MainMenu():
 
             (dy, dx) = self.map1.find_destination()
 
-            if dx + dy - x - y <= 0.5:
+            if abs(dx - x) <= 1 and abs(dy - y) <= 1:
                 self.enemies[i].hide()
                 self.enemies[i] = None
                 self.lives = self.lives - 1
@@ -465,7 +463,7 @@ class MainMenu():
                 self.sfx.volume = gameUtils.volumes(self.sfx_level)
                 self.sfx.play()
 
-                if self.lives == 0:
+                if self.lives <= 0:
                     self.isWin = False
                     pyglet.clock.unschedule(self.endGame)
                     self.endGame(0)
@@ -493,9 +491,13 @@ class MainMenu():
                 if self.tick % self.buildings[i].cooldown == 0:
                     e.hp = e.hp - 1
                     self.enemies[j] = e
-                    if self.enemies[j].hp <= 0:
-                        self.enemies[j].sprite.batch = None
-                        self.enemies[j] = None
+                    if self.enemies[j].hp < 1:
+                        # self.enemies[j].hide()
+                        (y, x) = self.map1.find_start()
+                        self.enemies[j].sprite.x = 190 + x * 80;
+                        self.enemies[j].sprite.y = 210 + (constant.LINE - 1 - y) * 80;
+                        self.enemies[j].visited = [[0 for x in range(constant.COLUMN)] for y in range(constant.LINE)]
+                        # self.enemies[j] = None
                         self.sfx.delete()
                         self.sfx = pyglet.media.Player()
                         self.sfx.queue(pyglet.media.load(gameUtils.getFilePath('enemy_killed.wav', constant.TYPE_SOUND)))
@@ -509,21 +511,11 @@ class MainMenu():
             self.preview.batch = None
             self.preview = None
 
-        # for i in range(self.buildings_size):
-        #     if self.buildings_preview[i] != None:
-        #         self.buildings_preview[i].batch = None
-        #         self.buildings_preview[i] = None
-
-        # for i in range(180):
-        #     if self.buildings[i] != None:
-        #         self.buildings[i].batch = None
-        #         self.buildings[i] = None
-
         self.locations = [[(0, 0), (0, 0), (0, 0)],
                           [(0, 0), (0, 0), (0, 0)],
                           [(0, 0), (0, 0), (0, 0)],
                           [(0, 0), (0, 0), (0, 0)],
-                          [(0, 0), (0, 0), (0, 0)]];
+                          [(0, 0), (0, 0), (0, 0)]]
 
         self.tick = 0
 
@@ -537,6 +529,7 @@ class MainMenu():
             self.livesLabel.text = 'You lost the game! Press ESC to exit...'
             self.sfx.queue(pyglet.media.load(gameUtils.getFilePath('game_lost.mp3', constant.TYPE_SOUND)))
 
+        self.livesLabel.x = self.livesLabel.x + 200
         self.sfx.volume = gameUtils.volumes(self.sfx_level)
         self.sfx.play()
 
@@ -577,7 +570,7 @@ class MainMenu():
         for i in range(constant.TOTAL):
             pyglet.clock.schedule_once(self.spawnEnemy, i * 5)
 
-        pyglet.clock.schedule_interval(self.moveEnemies, 0.3)
+        pyglet.clock.schedule_interval(self.moveEnemies, 0.8)
         pyglet.clock.schedule_interval(self.gameTicks, 1)
         pyglet.clock.schedule_interval(self.shootEnemies, 1)
         pyglet.clock.schedule_once(self.endGame, 300)
