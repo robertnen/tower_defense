@@ -2,7 +2,7 @@
 A 2D game made in Python using [Pyglet](https://pyglet.org). Are you bored of looking at towers? Do you want them to shoot some enemies and to hear some cool music?
 We have the solution! Tower defense is a game containing simple shapes as buildings trying to save your base from being killed by unknown foes. Just pick a building from the right side and place it on sand. It is awesome!
 
-[Tower Defense background](https://www.youtube.com/watch?v=9fCq2ZyGRy8)
+[Tower Defense preview](https://www.youtube.com/watch?v=9fCq2ZyGRy8)
 
 # How to play the game
 You will need to install Pyglet[^1] before playing the game.
